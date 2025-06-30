@@ -1,0 +1,10 @@
+streamlit
+langgraph
+langchain-core
+langchain-groq
+langchain
+pydantic
+googlemaps
+python-dotenv
+pillow
+groq

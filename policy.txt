@@ -1,0 +1,9 @@
+Eligible if:
+    Employment Status: Permanent employee like engineer
+    Any engineer
+    Distance must be greater than 2 km and less than 50 km from office location
+    
+    
+Not Eligible if:
+    Work-from-home employees (>80% remote work)
+    Trainees and interns
