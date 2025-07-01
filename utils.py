@@ -58,16 +58,15 @@ Respond in format:
 
 def validate_vehicle_documents(full_name,license_b64,ownership_b64):
 
-    license_text = get_text_from_image(license_b64) # Assuming you create a helper for this
+    license_text = get_text_from_image(license_b64) 
     ownership_text = get_text_from_image(ownership_b64)
 
     # Step 2: Use an LLM to perform the validation logic
     
     parser = PydanticOutputParser(pydantic_object=VehicleDocsValidationResult)
     
-    prompt = ChatMessagePromptTemplate.from_messages([
-        ("system", f"You are a validation expert. Your response must be in the following JSON format: {parser.get_format_instructions()}"),
-        ("human",  """
+    prompt = PromptTemplate(
+            template="""
             You are an HR compliance verification bot. Your task is to verify an employee's driving license and vehicle ownership document.
 
             An employee named **{employee_name}** has submitted two documents.
@@ -86,10 +85,16 @@ def validate_vehicle_documents(full_name,license_b64,ownership_b64):
             1.  Extract the full name from the Driving License.
             2.  Extract the owner's full name from the Vehicle Ownership document.
             3.  Compare both extracted names with the employee's provided name (`{employee_name}`). All three names must reasonably match (minor variations are acceptable).
-
-            Based on your analysis, determine if the documents are valid.
-            """)
-            ])
+        
+            Respond in only in below format , not in code:
+            ---
+            {format_instructions}
+            ---
+            """,
+            input_variables=["employee_name", "license_text", "ownership_text"],
+            partial_variables={"format_instructions": parser.get_format_instructions()}
+            )
+            
     
     chain = prompt | llm | parser
     result = chain.invoke({
@@ -97,7 +102,7 @@ def validate_vehicle_documents(full_name,license_b64,ownership_b64):
         "license_text": license_text,
         "ownership_text": ownership_text
     })
-
+    print("validate_vehicle_documents res",result)
     return result
 
 def get_text_from_image(image_b64):
@@ -117,6 +122,8 @@ def get_text_from_image(image_b64):
                         The keys should be the labels (e.g., "Customer Name", "Bill Date", "Amount Due").
                         The values should be the corresponding text or numbers extracted from the document.
                         If a value is not found or is unreadable, use `null`.
+                        
+                        Just give dictionary and nothing else.
 
                         Example output format:
                         {

@@ -101,6 +101,7 @@ with st.sidebar:
     if st.button("Process Application", use_container_width=True):
         if address and job_title and address_proof and full_name:
             run_initial_workflow(address, job_title, address_proof,full_name)
+            st.rerun()
         else:
             st.error("Please fill in all fields and upload a proof file.")
 

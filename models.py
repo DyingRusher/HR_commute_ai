@@ -14,7 +14,7 @@ class State(TypedDict):
     driving_license_b64: Optional[str]
     vehicle_ownership_b64: Optional[str]
     vehicle_docs_are_valid: Optional[bool]
-    
+
     workflow_ended: Optional[bool]
     transport_mode: Optional[int]
 

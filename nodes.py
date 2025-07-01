@@ -154,7 +154,6 @@ def mode4(state):
     print(" Mode 4: personal")
     state["messages"].append(AIMessage(content=f"Since you have chosen a private vehicle as your mode of commute, you are eligible for a fuel allowance based on the distance traveled, and a maintenance allowance depending on the company and model of the vehicle."))
     
-    print("state",state)
     return state
 
 
@@ -169,12 +168,12 @@ def get_vechicle_detail(state):
 
 def validation_vehicle(state):
 
-    intr = interrupt({'state':"upload driving license and ownership proof"})
+    state = interrupt({'state':"upload driving license and ownership proof"})
 
-    print("--- Validating Vehicle Documents ---",intr)
+    print("--- Validating Vehicle Documents ---")
 
     result = validate_vehicle_documents(
-        employee_name=state['full_name'], 
+        full_name=state['full_name'], 
         license_b64=state['driving_license_b64'],
         ownership_b64=state['vehicle_ownership_b64']
     )
@@ -185,5 +184,6 @@ def validation_vehicle(state):
     else:
         state['messages'].append(AIMessage(content=f"Document validation failed. Reason: {result.reason}. Please try again with clear documents."))
         state['workflow_ended'] = True
+        
     return state
     

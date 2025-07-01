@@ -59,12 +59,14 @@ builder.add_edge('get_vehicle_detail','validation_vehicle')
 
 
 def validation_vehicle_route(state):
-    if state.get("vehicle_docs_are_valid", False):
+    print("validation docs" , state["vehicle_docs_are_valid"])
+    if state["vehicle_docs_are_valid"] == False:
         return END
     else:
         return "m4"
     
 builder.add_conditional_edges("validation_vehicle", validation_vehicle_route)
+
 builder.add_edge('m1',END)
 builder.add_edge('m2',END)
 builder.add_edge('m3',END)
