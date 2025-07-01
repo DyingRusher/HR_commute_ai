@@ -4,7 +4,7 @@ from langgraph.graph import StateGraph, END
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.types import Command
 import json
-from nodes import start_node, classi4, mode1, mode2, mode3, mode4,choose_mode,validation_add,get_add,policy_validate
+from nodes import start_node, classi4, mode1, mode2, mode3, mode4,choose_mode,validation_add,get_add,policy_validate,get_vechicle_detail,validation_vehicle
 from models import State
 from utils import load_policy
 import uuid
@@ -30,12 +30,13 @@ builder.add_node("cl4", classi4)
 builder.add_node("m1", mode1)
 builder.add_node("m2", mode2)
 builder.add_node("m3", mode3)
+builder.add_node("get_vehicle_detail",get_vechicle_detail)
+builder.add_node("validation_vehicle",validation_vehicle)
 builder.add_node("m4", mode4)
 
 
 builder.add_edge('st','get_add')
 builder.add_edge('get_add','validation_add')
-
 
 def validation_router(state):
     if state.get("workflow_ended", False):
@@ -54,6 +55,16 @@ def policy_router(state):
 builder.add_conditional_edges("policy_validate", policy_router)
 
 builder.add_conditional_edges("choose_mode", classi4)
+builder.add_edge('get_vehicle_detail','validation_vehicle')
+
+
+def validation_vehicle_route(state):
+    if state.get("vehicle_docs_are_valid", False):
+        return END
+    else:
+        return "m4"
+    
+builder.add_conditional_edges("validation_vehicle", validation_vehicle_route)
 builder.add_edge('m1',END)
 builder.add_edge('m2',END)
 builder.add_edge('m3',END)

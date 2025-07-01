@@ -1,9 +1,6 @@
 from groq import Groq
 import base64
 import os
-import streamlit as st
-from PIL import Image
-from io import BytesIO
 
 def encode_image_by_path(image_path):
   with open(image_path, "rb") as image_file:
@@ -16,11 +13,6 @@ def encode_image(image):
   print("type",type(base64_string))
   return base64_string
 
-# Path to your image
-# image_path = "Electric_bill.jpg"
-
-# # Getting the base64 string
-# base64_image = encode_image_by_path(image_path)
 
 def get_address(image):
     
@@ -56,11 +48,3 @@ def get_address(image):
     return completion.choices[0].message.content
 
 
-# st.title("AI for HR Commute Automation")
-# address_proof = st.file_uploader("Upload proof of address",type=['png','jpg'])
-
-# print(type(address_proof))
-# if address_proof:
-    
-#     get_address(address_proof)
-#     st.image(address_proof)

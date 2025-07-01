@@ -101,9 +101,50 @@ with st.sidebar:
     if st.button("Process Application", use_container_width=True):
         if address and job_title and address_proof and full_name:
             run_initial_workflow(address, job_title, address_proof,full_name)
+            st.rerun()
         else:
             st.error("Please fill in all fields and upload a proof file.")
 
+
+    last_ai_message = ""
+    if st.session_state.graph_state and st.session_state.graph_state.get('messages'):
+        ai_messages = [m.content for m in st.session_state.graph_state['messages'] if isinstance(m, AIMessage)]
+        if ai_messages:
+            last_ai_message = ai_messages[-1]
+    
+    if "Driving License" in last_ai_message:
+        st.session_state.awaiting_vehicle_docs = True
+
+    
+    if st.session_state.awaiting_vehicle_docs:
+        st.subheader("Vehicle Document Upload")
+        license_file = st.file_uploader("Upload Driving License", key="license_upload")
+        ownership_file = st.file_uploader("Upload Vehicle Ownership Proof", key="ownership_upload")
+
+        if st.button("Submit Vehicle Documents"):
+            if license_file and ownership_file:
+                with st.spinner("Verifying documents..."):
+                    
+                    st.session_state.graph_state['driving_license_b64'] = base64.b64encode(license_file.read()).decode('utf-8')
+                    st.session_state.graph_state['vehicle_ownership_b64'] = base64.b64encode(ownership_file.read()).decode('utf-8')
+                    
+                    
+                    with st.chat_message("assistant"):
+                        placeholder = st.empty()
+                        placeholder.info("Assistant is thinking...")
+                        print("validate vehicle",st.session_state.graph_state)
+                        output_state = invoke_our_graph(st.session_state.graph_state, placeholder)
+                        st.session_state.graph_state = output_state
+                        if output_state["messages"]:
+                           latest_message = output_state["messages"][-1]
+                           if isinstance(latest_message, AIMessage):
+                               placeholder.markdown(latest_message.content)
+
+                    # Reset the flag and rerun to clean up the UI
+                    st.session_state.awaiting_vehicle_docs = False
+                    st.rerun()
+            else:
+                st.error("Please upload both documents to submit.")
 
 st.header("Conversation with HR Assistant")
 display_chat_history()
@@ -112,44 +153,10 @@ if prompt := st.chat_input("Say something..."):
 
     if st.session_state.initial_workflow_done:
         handle_chat_input(prompt)
+        st.rerun() # Rerun to update state and check for new UI elements
     else:
         st.warning("Please process the application using the sidebar before chatting.")
 
-    last_ai_message = ""
-    if st.session_state.graph_state and st.session_state.graph_state.get('messages'):
-        ai_messages = [m.content for m in st.session_state.graph_state['messages'] if isinstance(m, AIMessage)]
-        if ai_messages:
-            last_ai_message = ai_messages[-1]
-
-    if "Driving License" in last_ai_message :
-        st.session_state.awaiting_vehicle_docs = True
-
-    if st.session_state.awaiting_vehicle_docs:
-        st.sidebar.subheader("Vehicle Document Upload")
-        license_file = st.sidebar.file_uploader("Upload Driving License", key="license_upload")
-        ownership_file = st.sidebar.file_uploader("Upload Vehicle Ownership Proof", key="ownership_upload")
-
-        if st.sidebar.button("Submit Vehicle Documents"):
-            if license_file and ownership_file:
-                with st.spinner("Verifying documents..."):
-                    
-                    st.session_state.graph_state['driving_license_b64'] = base64.b64encode(license_file.read()).decode('utf-8')
-                    st.session_state.graph_state['vehicle_ownership_b64'] = base64.b64encode(ownership_file.read()).decode('utf-8')
-                    with st.chat_message("assistant"):
-                        placeholder = st.empty()
-                        placeholder.info("Assistant is thinking...")
-
-                        current_state = st.session_state.graph_state
-                        output_state = invoke_our_graph(current_state, placeholder)
-
-                        st.session_state.graph_state = output_state
-                        if output_state["messages"]:
-                            latest_message = output_state["messages"][-1]
-                            if isinstance(latest_message, AIMessage):
-                                placeholder.markdown(latest_message.content)
-
-                    
-                    st.session_state.awaiting_vehicle_docs = False 
 
 if st.sidebar.checkbox("Show Debug Info"):
     st.sidebar.subheader("Graph State Debug")

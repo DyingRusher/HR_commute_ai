@@ -6,7 +6,7 @@ from langchain.schema import SystemMessage
 from langchain_groq import ChatGroq
 from langgraph.types import Command, interrupt
 from models import Classification4, Eligible,Get_address,Validate_address
-from utils import cal_map_dis, load_policy,is_eligible
+from utils import cal_map_dis, load_policy,is_eligible,validate_vehicle_documents
 from dotenv import load_dotenv
 from validation_photos import get_address
 import os
@@ -123,7 +123,7 @@ def classi4(state):
     elif mode == 3:
         return 'm3'
     elif mode == 4:
-        return 'm4'
+        return 'get_vehicle_detail'
     else:
         state["messages"].append(AIMessage(content=f"We can not determine which mode of transport you hae choose by your response.  \n  please try again."))
         return 'st'
@@ -156,3 +156,34 @@ def mode4(state):
     
     print("state",state)
     return state
+
+
+def get_vechicle_detail(state):
+    print("in get_vechicle_detail")
+
+    state['messages'].append(AIMessage(
+        content="To proceed with the private vehicle allowance, please upload a clear image of your **Driving License** and **Vehicle Ownership Proof** in the sidebar."
+    ))
+
+    return state
+
+def validation_vehicle(state):
+
+    intr = interrupt({'state':"upload driving license and ownership proof"})
+
+    print("--- Validating Vehicle Documents ---",intr)
+
+    result = validate_vehicle_documents(
+        employee_name=state['full_name'], 
+        license_b64=state['driving_license_b64'],
+        ownership_b64=state['vehicle_ownership_b64']
+    )
+    
+    state['vehicle_docs_are_valid'] = result.is_valid
+    if result.is_valid:
+        state['messages'].append(AIMessage(content=f"Documents verified successfully. "))
+    else:
+        state['messages'].append(AIMessage(content=f"Document validation failed. Reason: {result.reason}. Please try again with clear documents."))
+        state['workflow_ended'] = True
+    return state
+    
