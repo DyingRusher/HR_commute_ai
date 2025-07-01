@@ -2,9 +2,7 @@
 
 An intelligent, AI-powered web application designed to automate the process of verifying and approving employee commute allowances. This tool streamlines HR workflows by validating addresses against official documents, checking policy eligibility, verifying vehicle ownership for private vehicle claims, and calculating allowances based on the employee's mode of transport.
 
-
-
-*(This is a static image of your workflow diagram. It's good practice to generate a PNG of your Mermaid diagram and upload it to a service like Imgur or directly into your repository.)*
+![Untitled diagram _ Mermaid Chart-2025-07-01-150853](https://github.com/user-attachments/assets/a9795aaa-0a37-445d-9569-9d8e18f517b2)
 
 ---
 
@@ -15,7 +13,6 @@ An intelligent, AI-powered web application designed to automate the process of v
 *   **Secure Document Validation**: For private vehicle claims, the system requires and validates the employee's Driving License and Vehicle Ownership proof.
 *   **Dynamic Distance Calculation**: Integrates with the Google Maps API to accurately calculate the commute distance between the employee's home and the office.
 *   **Interactive Chat Interface**: Engages with the employee through a conversational UI to determine their mode of transport and provide specific allowance details.
-*   **Dockerized for Easy Deployment**: The entire application is containerized with Docker, ensuring a consistent and portable setup for development and production.
 *   **Modular & Maintainable**: Built with a modular architecture using LangGraph, making it easy to modify the workflow, prompts, or external services.
 
 ## ⚙️ Tech Stack
@@ -24,8 +21,6 @@ An intelligent, AI-powered web application designed to automate the process of v
 *   **AI Workflow Orchestration**: [LangGraph](https://github.com/langchain-ai/langgraph)
 *   **Large Language Models (LLM)**: [Groq](https://groq.com/) API with Llama & Llava models.
 *   **Mapping Service**: [Google Maps Distance Matrix API](https://developers.google.com/maps/documentation/distance-matrix)
-*   **Containerization**: [Docker](https://www.docker.com/)
-
 ---
 
 ## 🛠️ Getting Started
@@ -95,36 +90,3 @@ The application follows a robust, multi-step validation process to ensure compli
 ### Customizing the Policy
 
 The core eligibility rules can be easily modified without changing any code. Simply edit the `policy.txt` file with your company's specific rules for job roles and distance requirements.
-
----
-
-## 🚀 Deployment
-
-This application is designed for easy deployment to any cloud provider that supports Docker.
-
-### Pushing to Docker Hub
-
-1.  **Log in to Docker Hub:**
-    ```sh
-    docker login
-    ```
-2.  **Tag your image:** (Replace `yourdockerid` with your Docker Hub username)
-    ```sh
-    docker tag hr-commute-app yourdockerid/hr-commute-app:latest
-    ```
-3.  **Push the image:**
-    ```sh
-    docker push yourdockerid/hr-commute-app:latest
-    ```
-
-The image can now be pulled and run on any server or cloud service (e.g., AWS ECS, Google Cloud Run, Azure App Service) for production use.
-
----
-
-## 🤝 Contributing
-
-Contributions, issues, and feature requests are welcome! Please feel free to check the [issues page](https://github.com/DyingRusher/HR_commute_ai/issues) for this repository.
-
-## 📄 License
-
-This project is licensed under the MIT License. See the `LICENSE` file for details.
